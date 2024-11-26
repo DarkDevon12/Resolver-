@@ -1,24 +1,48 @@
 import React from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, ImageBackground } from 'react-native';
+import {
+  View,
+  Text,
+  StyleSheet,
+  TouchableOpacity,
+  ImageBackground,
+  Image,
+} from 'react-native';
 
 export default function Hero({ navigation }) {
   return (
     <ImageBackground
-      source={require('../../assets/images/city-blue-sky.jpg')} // Caminho corrigido para a imagem
+      source={require('../../assets/images/city-blue-sky.jpg')} // Caminho da imagem de fundo
       style={styles.background}
-      resizeMode="cover" // Ajusta a imagem para cobrir o fundo
+      resizeMode="cover"
     >
       <View style={styles.overlay}>
-        {/* Conteúdo da Hero */}
+        {/* Logo acima do título */}
+        <Image
+          source={require('../../assets/images/logo.png')} // Caminho da logo
+          style={styles.logo}
+          resizeMode="contain" // Ajusta para manter as proporções
+        />
+
+        {/* Título e Descrição */}
         <Text style={styles.title}>Resolver+</Text>
         <Text style={styles.subtitle}>
           Transforme sua cidade com denúncias inteligentes. Participe e receba benefícios!
         </Text>
+
+        {/* Botão para Começar */}
         <TouchableOpacity
-          style={styles.button}
+          style={styles.primaryButton}
           onPress={() => navigation.navigate('Login')}
         >
           <Text style={styles.buttonText}>Começar Agora</Text>
+        </TouchableOpacity>
+
+        {/* Botão para About Us */}
+        <TouchableOpacity
+          style={styles.secondaryButton}
+          onPress={() => navigation.navigate('AboutUs')}
+        >
+          <Text style={styles.buttonText}>Conheça nossa ideia</Text>
         </TouchableOpacity>
       </View>
     </ImageBackground>
@@ -32,30 +56,47 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   overlay: {
-    backgroundColor: 'rgba(0, 0, 0, 0.5)', // Fundo escuro translúcido para melhor contraste
+    backgroundColor: 'rgba(0, 0, 0, 0.5)', // Fundo translúcido para contraste
     padding: 20,
     borderRadius: 10,
     alignItems: 'center',
   },
+  logo: {
+    width: 150, // Largura da logo
+    height: 150, // Altura da logo
+    marginBottom: 20, // Espaço entre a logo e o título
+  },
   title: {
     fontSize: 32,
     fontWeight: 'bold',
-    color: '#FFFFFF', // Texto branco para destacar sobre o fundo
+    color: '#FFFFFF',
     marginBottom: 10,
     textAlign: 'center',
   },
   subtitle: {
     fontSize: 16,
-    color: '#DDDDDD', // Cinza claro para suavidade
+    color: '#DDDDDD',
     textAlign: 'center',
     marginBottom: 20,
     lineHeight: 24,
   },
-  button: {
-    backgroundColor: '#A4C3B2', // Verde pastel
+  primaryButton: {
+    backgroundColor: 'green', // Verde pastel
     paddingVertical: 12,
     paddingHorizontal: 25,
     borderRadius: 25, // Botão arredondado
+    width: '210',
+    alignItems: 'center',
+    marginBottom: 10,
+  },
+  secondaryButton: {
+    backgroundColor: 'blue', // Azul pastel
+    paddingVertical: 12,
+    paddingHorizontal: 25,
+    borderRadius: 25, // Botão arredondado
+    width: '210',
+    alignItems: 'center',
+    marginBottom: 10,
   },
   buttonText: {
     color: '#FFFFFF',
