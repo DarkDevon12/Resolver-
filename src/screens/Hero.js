@@ -6,9 +6,19 @@ import {
   TouchableOpacity,
   ImageBackground,
   Image,
+  Linking,
 } from 'react-native';
 
 export default function Hero({ navigation }) {
+  const handleWhatsApp = () => {
+    const message = 'Olá, preciso de ajuda com o Resolver Plus!';
+    const phoneNumber = '17981117587';
+    const url = `https://wa.me/${phoneNumber}?text=${encodeURIComponent(message)}`;
+    Linking.openURL(url).catch((err) =>
+      console.error('Erro ao abrir o WhatsApp:', err)
+    );
+  };
+
   return (
     <ImageBackground
       source={require('../../assets/images/city-blue-sky.jpg')} // Caminho da imagem de fundo
@@ -16,11 +26,11 @@ export default function Hero({ navigation }) {
       resizeMode="cover"
     >
       <View style={styles.overlay}>
-        {/* Logo acima do título */}
+        {/* Adicionando a Logo */}
         <Image
-          source={require('../../assets/images/logo.png')} // Caminho da logo
+          source={require('../../assets/images/logo-1.png')} // Caminho da logo
           style={styles.logo}
-          resizeMode="contain" // Ajusta para manter as proporções
+          resizeMode="contain"
         />
 
         {/* Título e Descrição */}
@@ -29,7 +39,7 @@ export default function Hero({ navigation }) {
           Transforme sua cidade com denúncias inteligentes. Participe e receba benefícios!
         </Text>
 
-        {/* Botão para Começar */}
+        {/* Botão para Login */}
         <TouchableOpacity
           style={styles.primaryButton}
           onPress={() => navigation.navigate('Login')}
@@ -37,14 +47,27 @@ export default function Hero({ navigation }) {
           <Text style={styles.buttonText}>Começar Agora</Text>
         </TouchableOpacity>
 
-        {/* Botão para About Us */}
+        {/* Botão para Sobre Nós */}
         <TouchableOpacity
           style={styles.secondaryButton}
           onPress={() => navigation.navigate('AboutUs')}
         >
           <Text style={styles.buttonText}>Conheça nossa ideia</Text>
         </TouchableOpacity>
+
+        {/* Botão para Notícias */}
+        <TouchableOpacity
+          style={styles.newsButton}
+          onPress={() => Linking.openURL('https://jornaldebarretos.com.br')}
+        >
+          <Text style={styles.buttonText}>Notícias</Text>
+        </TouchableOpacity>
       </View>
+
+      {/* Botão para Suporte/SAC */}
+      <TouchableOpacity style={styles.supportButton} onPress={handleWhatsApp}>
+        <Text style={styles.supportButtonText}>Fale com o Suporte</Text>
+      </TouchableOpacity>
     </ImageBackground>
   );
 }
@@ -62,9 +85,9 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   logo: {
-    width: 150, // Largura da logo
-    height: 150, // Altura da logo
-    marginBottom: 20, // Espaço entre a logo e o título
+    width: 150, // Ajuste da largura da logo
+    height: 150, // Ajuste da altura da logo
+    marginBottom: 10, // Espaço entre a logo e o título
   },
   title: {
     fontSize: 32,
@@ -98,7 +121,36 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginBottom: 10,
   },
+  newsButton: {
+    backgroundColor: 'gray', // Cinza para o botão de notícias
+    paddingVertical: 12,
+    paddingHorizontal: 25,
+    borderRadius: 25, // Botão arredondado
+    width: '210',
+    alignItems: 'center',
+    marginBottom: 10,
+  },
   buttonText: {
+    color: '#FFFFFF',
+    fontWeight: 'bold',
+    fontSize: 16,
+  },
+  supportButton: {
+    position: 'absolute',
+    bottom: 30, // Posicionado na parte inferior da tela
+    right: 20,
+    backgroundColor: '#25D366', // Cor do WhatsApp
+    paddingVertical: 12,
+    paddingHorizontal: 25,
+    borderRadius: 25,
+    alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.3,
+    shadowRadius: 4,
+    elevation: 5,
+  },
+  supportButtonText: {
     color: '#FFFFFF',
     fontWeight: 'bold',
     fontSize: 16,

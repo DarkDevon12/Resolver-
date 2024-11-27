@@ -12,7 +12,6 @@ import {
 
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-
 function validateCPF(cpf) {
   cpf = cpf.replace(/\D/g, ''); // Remove caracteres não numéricos
 
@@ -71,12 +70,12 @@ export default function Login({ navigation }) {
       setError('CPF incompleto. Por favor, insira os 11 dígitos do CPF.');
       return;
     }
-  
+
     if (validateCPF(cleanedCpf)) {
       setError('');
       try {
         await AsyncStorage.setItem('currentUserCPF', cleanedCpf); // Salva o CPF no AsyncStorage
-        navigation.navigate('Formulario'); // Navega para o formulário
+        navigation.navigate('Task'); // Agora navega para a tela Task
       } catch (error) {
         console.error('Erro ao salvar CPF no AsyncStorage:', error);
       }

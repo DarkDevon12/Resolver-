@@ -12,38 +12,47 @@ import {
   TouchableWithoutFeedback,
   Image,
 } from 'react-native';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as ImagePicker from 'expo-image-picker';
 
-
 export default function Formulario({ navigation }) {
-  const [titulo, setTitulo] = useState('');
+  const [categoria, setCategoria] = useState('');
   const [descricao, setDescricao] = useState('');
   const [endereco, setEndereco] = useState('');
+  const [referencia, setReferencia] = useState(''); // Novo campo de referência
   const [imagens, setImagens] = useState([]);
   const [error, setError] = useState('');
 
-  // Solicitar permissões para a galeria
   useEffect(() => {
-    const requestPermissions = async () => {
-      const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
-      if (status !== 'granted') {
-        Alert.alert('Permissão Negada', 'Precisamos da permissão para acessar a galeria.');
-      }
-    };
-    requestPermissions();
-  }, []);
+    const unsubscribe = navigation.addListener('beforeRemove', (e) => {
+      e.preventDefault();
+
+      Alert.alert(
+        'Sair do Formulário',
+        'Você tem certeza que deseja sair? Os dados preenchidos serão perdidos.',
+        [
+          { text: 'Cancelar', style: 'cancel', onPress: () => {} },
+          {
+            text: 'Sair',
+            style: 'destructive',
+            onPress: () => navigation.dispatch(e.data.action),
+          },
+        ]
+      );
+    });
+
+    return unsubscribe;
+  }, [navigation]);
 
   const handleChooseFile = async () => {
     const result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      allowsMultipleSelection: true,
+      selectionLimit: 5,
       quality: 1,
     });
 
     if (!result.canceled) {
-      const validImages = result.assets.filter(
-        (image) => !image.fileSize || image.fileSize <= 10 * 1024 * 1024
-      );
+      const validImages = result.assets.filter((image) => image.fileSize <= 10 * 1024 * 1024);
       if (validImages.length < result.assets.length) {
         Alert.alert(
           'Erro',
@@ -54,57 +63,44 @@ export default function Formulario({ navigation }) {
     }
   };
 
-  const handleSubmit = async () => {
-    if (!titulo || !descricao || !endereco) {
+  const handleSubmit = () => {
+    if (!categoria || !descricao || !endereco) {
       setError('Por favor, preencha todos os campos.');
       return;
     }
-  
+
     if (imagens.length === 0) {
       Alert.alert('Atenção', 'Por favor, anexe pelo menos uma imagem como prova.');
       return;
     }
-  
-    const newReport = {
-      title: titulo,
-      description: descricao,
-      address: endereco,
+
+    const report = {
+      category: categoria,
+      description: descricao.trim(),
+      address: endereco.trim(),
+      reference: referencia.trim(), // Adiciona o ponto de referência
       status: 'Em análise',
       date: new Date().toLocaleString(),
       files: imagens,
     };
-  
-    try {
-      const currentUserCPF = await AsyncStorage.getItem('currentUserCPF'); // Obtém o CPF atual
-      if (!currentUserCPF) {
-        Alert.alert('Erro', 'CPF do usuário não encontrado. Faça login novamente.');
-        return;
-      }
-  
-      // Carrega denúncias existentes para o CPF
-      const storedReports = await AsyncStorage.getItem(`reports_${currentUserCPF}`);
-      const reports = storedReports ? JSON.parse(storedReports) : [];
-  
-      // Adiciona a nova denúncia
-      const updatedReports = [newReport, ...reports];
-      await AsyncStorage.setItem(`reports_${currentUserCPF}`, JSON.stringify(updatedReports));
-  
-      Alert.alert('Denúncia Enviada', 'Sua denúncia foi registrada com sucesso!', [
+
+    Alert.alert(
+      'Denúncia Enviada',
+      'Sua denúncia foi registrada com sucesso!',
+      [
         {
           text: 'OK',
-          onPress: () => navigation.navigate('MyReports'),
+          onPress: () => navigation.navigate('MyReports', { newReport: report }),
         },
-      ]);
-  
-      setTitulo('');
-      setDescricao('');
-      setEndereco('');
-      setImagens([]);
-      setError('');
-    } catch (error) {
-      console.error('Erro ao salvar denúncia:', error);
-      Alert.alert('Erro', 'Não foi possível registrar sua denúncia. Tente novamente.');
-    }
+      ]
+    );
+
+    setCategoria('');
+    setDescricao('');
+    setEndereco('');
+    setReferencia(''); // Limpa o campo de referência
+    setImagens([]);
+    setError('');
   };
 
   return (
@@ -116,13 +112,28 @@ export default function Formulario({ navigation }) {
         <View style={styles.form}>
           <Text style={styles.title}>Registrar Denúncia</Text>
 
-          <TextInput
-            style={styles.input}
-            placeholder="Título da denúncia"
-            placeholderTextColor="#aaa"
-            value={titulo}
-            onChangeText={setTitulo}
-          />
+          <View style={styles.selectBox}>
+            <Text style={styles.selectLabel}>Categoria</Text>
+            <TouchableOpacity
+              style={styles.dropdown}
+              onPress={() =>
+                Alert.alert('Escolha uma categoria', '', [
+                  { text: 'Buraco na via', onPress: () => setCategoria('Buraco na via') },
+                  { text: 'Luz do poste', onPress: () => setCategoria('Luz do poste') },
+                  { text: 'Água parada', onPress: () => setCategoria('Água parada') },
+                  { text: 'Lixo acumulado', onPress: () => setCategoria('Lixo acumulado') },
+                  { text: 'Árvore caída', onPress: () => setCategoria('Árvore caída') },
+                  { text: 'Semáforo defeituoso', onPress: () => setCategoria('Semáforo defeituoso') },
+                  { text: 'Placa caída', onPress: () => setCategoria('Placa caída') },
+                  { text: 'Cancelar', style: 'cancel' },
+                ])
+              }
+            >
+              <Text style={styles.dropdownText}>
+                {categoria ? categoria : 'Selecione uma categoria'}
+              </Text>
+            </TouchableOpacity>
+          </View>
 
           <TextInput
             style={[styles.input, styles.textArea]}
@@ -136,10 +147,18 @@ export default function Formulario({ navigation }) {
 
           <TextInput
             style={styles.input}
-            placeholder="Endereço completo (Rua, Bairro, Cidade, Estado)"
+            placeholder="Endereço (Rua, Número, bairro, cidade)"
             placeholderTextColor="#aaa"
             value={endereco}
             onChangeText={setEndereco}
+          />
+
+          <TextInput
+            style={styles.input}
+            placeholder="Ponto de Referência"
+            placeholderTextColor="#aaa"
+            value={referencia}
+            onChangeText={setReferencia}
           />
 
           <TouchableOpacity style={styles.fileButton} onPress={handleChooseFile}>
@@ -163,17 +182,8 @@ export default function Formulario({ navigation }) {
 
           {error ? <Text style={styles.error}>{error}</Text> : null}
 
-          {/* Botão para enviar denúncia */}
           <TouchableOpacity style={styles.button} onPress={handleSubmit}>
             <Text style={styles.buttonText}>Enviar Denúncia</Text>
-          </TouchableOpacity>
-
-          {/* Botão para ver minhas denúncias */}
-          <TouchableOpacity
-            style={[styles.button, styles.secondaryButton]}
-            onPress={() => navigation.navigate('MyReports')}
-          >
-            <Text style={styles.buttonText}>Ver Minhas Denúncias</Text>
           </TouchableOpacity>
         </View>
       </KeyboardAvoidingView>
@@ -220,8 +230,27 @@ const styles = StyleSheet.create({
     height: 100,
     textAlignVertical: 'top',
   },
+  selectBox: {
+    marginBottom: 20,
+  },
+  selectLabel: {
+    fontSize: 16,
+    color: '#333',
+    marginBottom: 8,
+  },
+  dropdown: {
+    borderWidth: 1,
+    borderColor: '#ddd',
+    borderRadius: 8,
+    padding: 12,
+    backgroundColor: '#FFF',
+  },
+  dropdownText: {
+    fontSize: 16,
+    color: '#333',
+  },
   fileButton: {
-    backgroundColor: '#007BFF',
+    backgroundColor: 'blue',
     paddingVertical: 10,
     borderRadius: 8,
     alignItems: 'center',
@@ -250,10 +279,6 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     alignItems: 'center',
     marginTop: 20,
-  },
-  secondaryButton: {
-    backgroundColor: '#007BFF',
-    marginTop: 10,
   },
   buttonText: {
     color: '#FFFFFF',

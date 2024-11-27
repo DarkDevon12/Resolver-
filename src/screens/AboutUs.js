@@ -9,9 +9,13 @@ export default function AboutUs() {
 
       {/* Texto de Introdução */}
       <Text style={styles.description}>
-        Resolver+ é uma plataforma que promove a participação ativa dos cidadãos na gestão urbana. Os usuários podem registrar denúncias de problemas como iluminação pública
-        defeituosa, buracos nas ruas ou acúmulo de lixo. A cada denúncia resolvida, o cidadão recebe pontos, que podem ser acumulados e convertidos em benefícios fiscais, como
-        descontos no IPTU.
+        O Resolver+ conecta você às autoridades para melhorar sua cidade. Aqui, você pode denunciar problemas como iluminação pública defeituosa, buracos nas ruas e acúmulo de lixo.
+
+        Cada denúncia resolvida acumula pontos que podem ser convertidos em descontos no IPTU, promovendo benefícios diretos para quem faz a diferença.
+
+        Com segurança e privacidade garantidas, o Resolver+ é gratuito e pensado para engajar cidadãos na construção de um ambiente urbano melhor.
+
+        Faça parte dessa mudança!
       </Text>
 
       <Text style={styles.description}>
@@ -20,7 +24,7 @@ export default function AboutUs() {
 
       {/* Imagem do Grupo */}
       <Image
-        source={require('../../assets/images/group.jpg')} // Caminho da imagem fornecida
+        source={require('../../assets/images/group.jpeg')} // Caminho da imagem fornecida
         style={styles.image}
         resizeMode="contain"
       />
